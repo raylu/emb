@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -75,8 +73,23 @@ namespace emb {
 			int mg_id = (int)value.Tag;
 			lbTypes.Items.Clear();
 			if (market_groups[mg_id].has_types)
-				foreach (Type t in types[mg_id])
-					lbTypes.Items.Add(t.name);
+				foreach (Type t in types[mg_id]) {
+					ListBoxItem item = new ListBoxItem();
+					item.Content = t.name;
+					item.Tag = t.id;
+					lbTypes.Items.Add(item);
+				}
+		}
+
+		private void lbTypes_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) {
+			ListBoxItem item = (ListBoxItem)lbTypes.SelectedItem;
+			int type_id = (int)item.Tag;
+			OrdersControl oc = new OrdersControl(type_id);
+			TabItem tab = new TabItem();
+			tab.Header = item.Content;
+			tab.Content = oc;
+			tcTypes.Items.Add(tab);
+			tcTypes.SelectedItem = tab;
 		}
 	}
 
