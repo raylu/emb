@@ -11,8 +11,8 @@
             <ColumnDefinition Width="228*" />
             <ColumnDefinition Width="566*" />
         </Grid.ColumnDefinitions>
-        <ListBox Name="types" Grid.Row="1" />
+        <ListBox Name="lbTypes" Grid.Row="1" />
         <ListBox HorizontalAlignment="Left" Margin="167,30,0,0" Name="listBox2" Width="277" Grid.Column="1" Height="195" VerticalAlignment="Top" />
-        <TreeView Name="groups" />
+        <TreeView Name="tvGroups" SelectedItemChanged="tvGroups_SelectedItemChanged" />
     </Grid>
 </Window>
