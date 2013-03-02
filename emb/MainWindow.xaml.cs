@@ -5,10 +5,8 @@ using System.Windows;
 using System.Windows.Controls;
 
 namespace emb {
-	/// <summary>
-	/// Interaction logic for MainWindow.xaml
-	/// </summary>
 	public partial class MainWindow : Window {
+		private IDictionary<int,MarketGroup> market_groups = new Dictionary<int,MarketGroup>();
 		private IDictionary<int,IList<Type>> types = new Dictionary<int,IList<Type>>();
 
 		public MainWindow() {
@@ -17,11 +15,10 @@ namespace emb {
 
 		private void Window_Loaded(object sender, RoutedEventArgs e) {
 			IEnumerable<string> mg_reader = System.IO.File.ReadLines("inv_market_groups.csv");
-			List<MarketGroup> market_groups = new List<MarketGroup>();
 			foreach (string line in mg_reader) {
 				MarketGroup mg = new MarketGroup();
 				string[] split = line.Split(',');
-				mg.id = int.Parse(split[0]);
+				int mg_id = int.Parse(split[0]);
 				string parent = split[1];
 				if (parent == "null")
 					mg.parent_id = null;
@@ -29,9 +26,9 @@ namespace emb {
 					mg.parent_id = int.Parse(parent);
 				mg.name = split[2].Substring(1, split[2].Length-2);
 				mg.has_types = (split[3] == "1");
-				market_groups.Add(mg);
+				market_groups.Add(mg_id, mg);
 			}
-			add_children(tvGroups.Items, market_groups, null);
+			add_children(tvGroups.Items, null);
 
 			IEnumerable<string> type_reader = System.IO.File.ReadLines("inv_types.csv");
 			foreach (string line in type_reader) {
@@ -60,14 +57,14 @@ namespace emb {
 			return split;
 		}
 
-		private void add_children(ItemCollection group, IEnumerable<MarketGroup> market_groups, int? id) {
-			foreach (MarketGroup mg in market_groups) {
-				if (mg.parent_id == id) {
+		private void add_children(ItemCollection group, int? id) {
+			foreach (KeyValuePair<int,MarketGroup> mg in market_groups) {
+				if (mg.Value.parent_id == id) {
 					TreeViewItem item = new TreeViewItem();
-					item.Header = mg.name;
-					item.Tag = mg.id;
-					if (!mg.has_types)
-						add_children(item.Items, market_groups, mg.id);
+					item.Header = mg.Value.name;
+					item.Tag = mg.Key;
+					if (!mg.Value.has_types)
+						add_children(item.Items, mg.Key);
 					group.Add(item);
 				}
 			}
@@ -77,15 +74,13 @@ namespace emb {
 			TreeViewItem value = (TreeViewItem)e.NewValue;
 			int mg_id = (int)value.Tag;
 			lbTypes.Items.Clear();
-			if (!types.ContainsKey(mg_id)) return;
-			foreach (Type t in types[mg_id]) {
-				lbTypes.Items.Add(t.name);
-			}
+			if (market_groups[mg_id].has_types)
+				foreach (Type t in types[mg_id])
+					lbTypes.Items.Add(t.name);
 		}
 	}
 
 	struct MarketGroup {
-		public int id;
 		public int? parent_id;
 		public string name;
 		public bool has_types;
