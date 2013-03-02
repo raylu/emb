@@ -17,7 +17,7 @@ namespace emb {
 			IEnumerable<string> mg_reader = System.IO.File.ReadLines("inv_market_groups.csv");
 			foreach (string line in mg_reader) {
 				MarketGroup mg = new MarketGroup();
-				string[] split = line.Split(',');
+				string[] split = parse_csv_line(line, 4, 2);
 				int mg_id = int.Parse(split[0]);
 				string parent = split[1];
 				if (parent == "null")
