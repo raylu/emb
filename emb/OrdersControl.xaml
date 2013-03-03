@@ -3,14 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="200*" />
             <RowDefinition Height="100*" />
         </Grid.RowDefinitions>
-        <DataGrid AutoGenerateColumns="True" Name="dgSell" IsReadOnly="True"></DataGrid>
-        <DataGrid AutoGenerateColumns="True" Grid.Row="1" Name="dgBuy" IsReadOnly="True" />
+        <DataGrid Name="dgSell" IsReadOnly="True" CanUserResizeRows="False" HeadersVisibility="Column" AutoGenerateColumns="True" />
+        <DataGrid Grid.Row="1" Name="dgBuy" IsReadOnly="True" CanUserResizeRows="False" HeadersVisibility="Column" AutoGenerateColumns="True" />
     </Grid>
 </UserControl>

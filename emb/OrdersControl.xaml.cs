@@ -16,9 +16,9 @@ namespace emb {
 			this.type_id = type_id;
 
 			sell_orders.Columns.Add("Station", typeof(string));
-			sell_orders.Columns.Add("Price", typeof(float));
+			sell_orders.Columns.Add("Price", typeof(string));
 			buy_orders.Columns.Add("Station", typeof(string));
-			buy_orders.Columns.Add("Price", typeof(float));
+			buy_orders.Columns.Add("Price", typeof(string));
 			dgSell.DataContext = sell_orders;
 			dgSell.ItemsSource = sell_orders.DefaultView;
 			dgBuy.DataContext = buy_orders;
@@ -37,8 +37,8 @@ namespace emb {
 		private IEnumerable<Order> parse_orders(XDocument xml, string type) {
 			return (from o in xml.Descendants(type).Elements("order")
 				select new Order() {
-					station = o.Element("station_name").Value,
-					price = float.Parse(o.Element("price").Value),
+					station = o.Element("station_name").Value.Trim(),
+					price = float.Parse(o.Element("price").Value).ToString("N2"),
 				}
 			);
 		}
@@ -46,6 +46,6 @@ namespace emb {
 
 	class Order {
 		public string station;
-		public float price;
+		public string price;
 	}
 }

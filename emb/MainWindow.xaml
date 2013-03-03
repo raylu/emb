@@ -8,7 +8,7 @@
             <RowDefinition Height="269*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="228*" />
+            <ColumnDefinition Width="228" />
             <ColumnDefinition Width="566*" />
         </Grid.ColumnDefinitions>
         <ListBox Name="lbTypes" Grid.Row="1" MouseDoubleClick="lbTypes_MouseDoubleClick" />
