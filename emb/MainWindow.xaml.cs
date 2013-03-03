@@ -6,6 +6,7 @@ namespace emb {
 	public partial class MainWindow : Window {
 		private IDictionary<int,MarketGroup> market_groups = new Dictionary<int,MarketGroup>();
 		private IDictionary<int,IList<Type>> types = new Dictionary<int,IList<Type>>();
+		private IDictionary<int,string> regions = new Dictionary<int,string>();
 
 		public MainWindow() {
 			InitializeComponent();
@@ -22,7 +23,7 @@ namespace emb {
 					mg.parent_id = null;
 				else
 					mg.parent_id = int.Parse(parent);
-				mg.name = split[2].Substring(1, split[2].Length-2);
+				mg.name = split[2];
 				mg.has_types = (split[3] == "1");
 				market_groups.Add(mg_id, mg);
 			}
@@ -33,11 +34,18 @@ namespace emb {
 				string[] split = parse_csv_line(line, 3, 1);
 				Type t = new Type();
 				t.id = int.Parse(split[0]);
-				t.name = split[1].Substring(1, split[1].Length-2);
+				t.name = split[1];
 				int mg_id = int.Parse(split[2]);
 				if (!types.ContainsKey(mg_id))
 					types.Add(mg_id, new List<Type>());
 				types[mg_id].Add(t);
+			}
+
+			IEnumerable<string> region_reader = System.IO.File.ReadLines("map_regions.csv");
+			foreach (string line in region_reader) {
+				string[] split = parse_csv_line(line, 2, 1);
+				int id = int.Parse(split[0]);
+				regions[id] = split[1];
 			}
 		}
 
@@ -49,9 +57,9 @@ namespace emb {
 				int end = next.LastIndexOf('\"');
 				str += "," + next.Substring(0, end);
 				next = next.Substring(end+2);
-				split[string_index] = str;
 				split[string_index+1] = next;
 			}
+			split[string_index] = str.Substring(1, str.Length-2); // get rid of quotes
 			return split;
 		}
 
@@ -84,7 +92,7 @@ namespace emb {
 		private void lbTypes_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) {
 			ListBoxItem item = (ListBoxItem)lbTypes.SelectedItem;
 			int type_id = (int)item.Tag;
-			OrdersControl oc = new OrdersControl(type_id);
+			OrdersControl oc = new OrdersControl(type_id, regions);
 			TabItem tab = new TabItem();
 			tab.Header = item.Content;
 			tab.Content = oc;
