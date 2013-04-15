@@ -92,12 +92,17 @@ namespace emb {
 		private void lbTypes_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) {
 			ListBoxItem item = (ListBoxItem)lbTypes.SelectedItem;
 			int type_id = (int)item.Tag;
-			OrdersControl oc = new OrdersControl(type_id, regions);
+			OrdersControl oc = new OrdersControl(type_id, regions, tbFilter.Text);
 			TabItem tab = new TabItem();
 			tab.Header = item.Content;
 			tab.Content = oc;
 			tcTypes.Items.Add(tab);
 			tcTypes.SelectedItem = tab;
+		}
+
+		private void tbFilter_TextChanged(object sender, TextChangedEventArgs e) {
+			foreach (TabItem ti in tcTypes.Items)
+				((OrdersControl)ti.Content).filter(tbFilter.Text);
 		}
 	}
 

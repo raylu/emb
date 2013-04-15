@@ -10,26 +10,26 @@ namespace emb {
 	public partial class OrdersControl : UserControl {
 		private int type_id;
 		private IDictionary<int,string> regions;
+		IEnumerable<Order> sell_orders;
+		IEnumerable<Order> buy_orders;
+		DataTable visible_sell_orders = new DataTable();
+		DataTable visible_buy_orders = new DataTable();
 
-		public OrdersControl(int type_id, IDictionary<int,string> regions) {
+		public OrdersControl(int type_id, IDictionary<int,string> regions, string filter) {
 			InitializeComponent();
 			this.type_id = type_id;
 			this.regions = regions;
 
-			DataTable sell_orders = new DataTable();
-			DataTable buy_orders = new DataTable();
-			setup_table(sell_orders, dgSell);
-			setup_table(buy_orders, dgBuy);
+			setup_table(this.visible_sell_orders, dgSell);
+			setup_table(this.visible_buy_orders, dgBuy);
 
 			WebClient h = new WebClient();
 			string text = h.DownloadString("http://api.eve-central.com/api/quicklook?typeid=" + this.type_id);
 			XDocument xml = XDocument.Parse(text);
-			//Console.WriteLine(xml);
 
-			foreach (Order order in parse_orders(xml, "sell_orders"))
-				sell_orders.Rows.Add(new object[] {order.region, order.station, order.price, order.volume});
-			foreach (Order order in parse_orders(xml, "buy_orders"))
-				buy_orders.Rows.Add(new object[] {order.region, order.station, order.price, order.volume});
+			this.sell_orders = parse_orders(xml, "sell_orders");
+			this.buy_orders = parse_orders(xml, "buy_orders");
+			this.filter(filter);
 		}
 
 		private void setup_table(DataTable table, DataGrid grid_control) {
@@ -45,6 +45,17 @@ namespace emb {
 			return (from x in xml.Descendants(type).Elements("order")
 				select new Order(x, regions)
 			);
+		}
+
+		public void filter(string q) {
+			this.visible_sell_orders.Clear();
+			q = q.ToLower();
+			foreach (Order order in this.sell_orders)
+				if (q.Length == 0 || order.station.ToLower().Contains(q))
+					this.visible_sell_orders.Rows.Add(new object[] { order.region, order.station, order.price, order.volume });
+			foreach (Order order in this.buy_orders)
+				if (q.Length == 0 || order.station.ToLower().Contains(q))
+					this.visible_buy_orders.Rows.Add(new object[] {order.region, order.station, order.price, order.volume});
 		}
 	}
 
